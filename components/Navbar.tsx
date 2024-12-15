@@ -32,7 +32,7 @@ const Navbar = () => {
             <Link href="/yougee" className="text-orange-400 underline mb-5">
               Yougee
             </Link>
-            <Link href="/products" className="text-orange-400 underline">
+            <Link href="/samba" className="text-orange-400 underline">
               Samba
             </Link>
           </View>

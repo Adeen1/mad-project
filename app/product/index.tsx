@@ -3,17 +3,19 @@ import Navbar from "@/components/Navbar";
 import { supabase } from "@/utils/supabase";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-import { Link, useLocalSearchParams } from "expo-router";
+import { Link, useLocalSearchParams, router } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
-
+import Loader from "@/components/Loader";
 const Index = () => {
+  const [loading, setLoading] = useState(true);
   const search = useLocalSearchParams();
   console.log(search.id, typeof search.id);
 
   const [data, setData] = useState<any>(false);
 
   const fetchData = async () => {
+    setLoading(true);
     const req = await supabase
       .from("Products")
       .select("*")
@@ -22,6 +24,7 @@ const Index = () => {
     console.log(req.data[0], "data");
 
     setData(req.data[0]);
+    setLoading(false);
   };
 
   const addToCart = async (id: string) => {
@@ -50,32 +53,17 @@ const Index = () => {
 
     await AsyncStorage.setItem("cart", JSON.stringify(cart));
     console.log("Product added to cart:", cart);
-  };
-  const validateCartData = async () => {
-    const cartData = await AsyncStorage.getItem("cart");
-    if (cartData) {
-      try {
-        const cart = JSON.parse(cartData);
-        if (!cart.cart || !Array.isArray(cart.cart)) {
-          console.warn("Invalid cart data structure, resetting cart.");
-          await AsyncStorage.setItem("cart", JSON.stringify({ cart: [] }));
-        }
-      } catch (error) {
-        console.error("Failed to parse cart data:", error);
-        await AsyncStorage.setItem("cart", JSON.stringify({ cart: [] }));
-      }
-    }
+    router.push("/cart");
   };
 
   useEffect(() => {
-    // validateCartData(); // Call this on app initialization
-
     fetchData();
   }, []);
 
   return (
     <ScrollView contentContainerStyle={{ paddingBottom: 20 }}>
       <Navbar />
+      {loading && <Loader />}
       {data && (
         <View className="flex pb-3 flex-grow flex-1  flex-col items-center w-[90%] mt-4">
           <Image
