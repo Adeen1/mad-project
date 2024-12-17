@@ -14,9 +14,10 @@ import { supabase } from "@/utils/supabase";
 import Navbar from "@/components/Navbar";
 import Loader from "@/components/Loader";
 import { Ionicons } from "@expo/vector-icons";
+import { Cart } from "../types/products";
 
 const CartPage = () => {
-  const [data, setData] = useState<any>([]);
+  const [data, setData] = useState<Cart[]>([]);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
@@ -33,6 +34,7 @@ const CartPage = () => {
       const cartData = await AsyncStorage.getItem("cart");
       let cart = cartData ? JSON.parse(cartData) : [];
       setData(cart);
+      console.log("cart", cart);
       setLoading(false);
     } catch (error) {
       console.error("Error reading cart:", error);
@@ -40,11 +42,11 @@ const CartPage = () => {
     }
   };
 
-  const deleteItem = async (id: any) => {
+  const deleteItem = async (id: number) => {
     try {
       const cartData = await AsyncStorage.getItem("cart");
       let cart = cartData ? JSON.parse(cartData) : [];
-      const newCart = cart.filter((product: any) => product.id !== id);
+      const newCart = cart.filter((product: Cart) => product.id !== id);
       await AsyncStorage.setItem("cart", JSON.stringify(newCart));
       setData(newCart);
     } catch (error) {
@@ -56,7 +58,7 @@ const CartPage = () => {
     try {
       const cartData = await AsyncStorage.getItem("cart");
       let cart = cartData ? JSON.parse(cartData) : [];
-      const index = cart.findIndex((obj: any) => obj.id === id);
+      const index = cart.findIndex((obj: Cart) => obj.id === id);
       if (index !== -1) {
         if (cart[index].quantityItems === 1 && num === -1) {
           deleteItem(id);
@@ -72,10 +74,16 @@ const CartPage = () => {
   };
 
   const submitOrder = async () => {
-    if (!validateForm()) return;
+    setLoading(true);
+    setErrorStatus(0);
+    setErrorMessage("");
+    if (!validateForm()) {
+      setLoading(false);
+      return;
+    }
 
     let totalAmount = data.reduce(
-      (total: number, item: any) => total + item.price * item.quantityItems,
+      (total: number, item: Cart) => total + item.price * item.quantityItems,
       0
     );
 
@@ -94,7 +102,7 @@ const CartPage = () => {
 
       if (error) throw error;
 
-      const orderProductsList = data.map((item: any) => ({
+      const orderProductsList = data.map((item: Cart) => ({
         product_id: item.id,
         order_id: orderData.order_id,
         quantity: item.quantityItems,
@@ -106,11 +114,12 @@ const CartPage = () => {
         .insert(orderProductsList);
 
       if (orderProductsError) throw orderProductsError;
-
+      setLoading(false);
       Alert.alert("Success", "Order submitted successfully!");
       await AsyncStorage.removeItem("cart");
       setData([]);
     } catch (error: any) {
+      setLoading(false);
       Alert.alert("Error", error.message);
     }
   };
@@ -196,7 +205,7 @@ const CartPage = () => {
           </Text>
         )}
 
-        {data.map((item: any, index: number) => (
+        {data.map((item: Cart, index: number) => (
           <View key={index} style={styles.cartItem}>
             <Image source={{ uri: item.img }} style={styles.itemImage} />
             <View style={styles.itemDetails}>

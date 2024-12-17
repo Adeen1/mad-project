@@ -7,27 +7,45 @@ import { Link, useLocalSearchParams, router } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import Loader from "@/components/Loader";
+import { Cart, Product } from "../types/products";
+
 const Index = () => {
   const [loading, setLoading] = useState(true);
   const search = useLocalSearchParams();
   console.log(search.id, typeof search.id);
 
-  const [data, setData] = useState<any>(false);
+  const [data, setData] = useState<Product>({
+    brand: "",
+    created_at: "",
+    description: "",
+    image_url: "",
+    name: "",
+    price: 0,
+    product_id: 0,
+    quantity: 0,
+    resource: "",
+  });
 
   const fetchData = async () => {
     setLoading(true);
     const req = await supabase
       .from("Products")
       .select("*")
-      .eq("product_id", parseInt(search.id));
+      .eq(
+        "product_id",
+        typeof search.id === "string"
+          ? parseInt(search.id)
+          : parseInt(search.id[0])
+      );
+    const req_data: Product[] | null = req.data;
+    if (!req_data) return;
+    console.log(req_data[0] as Product, "data");
 
-    console.log(req.data[0], "data");
-
-    setData(req.data[0]);
+    setData(req_data[0]);
     setLoading(false);
   };
 
-  const addToCart = async (id: string) => {
+  const addToCart = async (id: number) => {
     const cartData = await AsyncStorage.getItem("cart");
     console.log("Stored cart data:", cartData); // Debugging: log retrieved data
 
@@ -37,7 +55,7 @@ const Index = () => {
       cart = []; // Reset to a valid structure
     }
 
-    const existingProductIndex = cart.findIndex((p: any) => p.id === id);
+    const existingProductIndex = cart.findIndex((p: Cart) => p.id === id);
 
     if (existingProductIndex !== -1) {
       cart[existingProductIndex].quantityItems += 1;
@@ -64,7 +82,7 @@ const Index = () => {
     <ScrollView contentContainerStyle={{ paddingBottom: 20 }}>
       <Navbar />
       {loading && <Loader />}
-      {data && (
+      {data.name && (
         <View className="flex pb-3 flex-grow flex-1  flex-col items-center w-[90%] mt-4">
           <Image
             source={{ uri: data.image_url }}
@@ -94,9 +112,11 @@ const Index = () => {
               >
                 <Text>Add To Cart</Text>
               </TouchableOpacity>
+
               <Link
-                className="bg-black text-white py-2 px-4 mt-4"
+                //@ts-ignore
                 href={data.resource || "/"}
+                className="bg-black text-white py-2 px-4 mt-4"
               >
                 Lear more{" "}
               </Link>

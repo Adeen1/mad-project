@@ -12,11 +12,12 @@ import { supabase } from "@/utils/supabase";
 import Navbar from "@/components/Navbar";
 import Card from "@/components/Card";
 import Loader from "@/components/Loader";
+import { Product } from "../types/products";
 
-const { width, height } = Dimensions.get("window");
+const { height } = Dimensions.get("window");
 
 const BrandPage = () => {
-  const [data, setData] = useState([]);
+  const [data, setData] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const { slug } = useLocalSearchParams();
 
@@ -24,8 +25,8 @@ const BrandPage = () => {
     setLoading(true);
     const req = await supabase.from("Products").select("*").eq("brand", slug);
 
-    console.log(req.data, req.status, req.error);
-    setData(req.data);
+    console.log("data", req.data);
+    setData(req.data as Product[]);
     setLoading(false);
   };
 
@@ -53,7 +54,8 @@ const BrandPage = () => {
         >
           <View style={styles.overlay}>
             <Text style={styles.title}>
-              {slug.charAt(0).toUpperCase() + slug.slice(1)}
+              {typeof slug == "string" &&
+                slug.charAt(0).toUpperCase() + slug.slice(1)}
             </Text>
           </View>
         </ImageBackground>
@@ -63,7 +65,7 @@ const BrandPage = () => {
           <View style={styles.content}>
             <Text style={styles.subtitle}>Our Products</Text>
             <View style={styles.cardContainer}>
-              {data.map((singleProd: any) => (
+              {data.map((singleProd: Product) => (
                 <Card
                   key={singleProd.name}
                   img={singleProd.image_url}

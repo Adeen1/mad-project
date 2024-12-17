@@ -17,6 +17,8 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     height: 300,
+    position: "absolute",
+    zIndex: 50,
   },
   loaderContainer: {
     alignItems: "center",
