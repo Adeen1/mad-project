@@ -1,56 +1,160 @@
-import Navbar from "@/components/Navbar";
+import React, { useRef, useEffect } from "react";
+import {
+  View,
+  Text,
+  Image,
+  Animated,
+  Dimensions,
+  TouchableOpacity,
+  ScrollView,
+  StyleSheet,
+} from "react-native";
 import { Link } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import React, { useState } from "react";
-import { Button, Image, Text, View } from "react-native";
+import Navbar from "@/components/Navbar";
 import yougeeMain from "@/assets/images/yougee-main.jpg";
 import sambaMain from "@/assets/images/samba-main.jpg";
-import { ScrollView } from "react-native";
 
-const index = () => {
+const { width } = Dimensions.get("window");
+
+const BrandCard = ({
+  title,
+  image,
+  link,
+}: {
+  title: string;
+  image: any;
+  link: string;
+}) => {
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const scaleAnim = useRef(new Animated.Value(0.9)).current;
+
+  useEffect(() => {
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 1000,
+        useNativeDriver: true,
+      }),
+      Animated.spring(scaleAnim, {
+        toValue: 1,
+        friction: 4,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, []);
+
   return (
-    <View>
-      <Navbar />
-      <ScrollView className="mb-20">
-        <View>
-          <Content />
+    <Animated.View
+      style={{
+        opacity: fadeAnim,
+        transform: [{ scale: scaleAnim }],
+        marginBottom: 20,
+      }}
+    >
+      <View style={styles.cardContainer}>
+        <Text style={styles.brandTitle}>{title}</Text>
+        <Image source={image} style={styles.brandImage} />
+        <View style={styles.overlay}>
+          <Link href={link} asChild>
+            <TouchableOpacity style={styles.shopButton}>
+              <Text style={styles.shopButtonText}>Shop Now</Text>
+            </TouchableOpacity>
+          </Link>
         </View>
-      </ScrollView>
-    </View>
+      </View>
+    </Animated.View>
   );
 };
 
 function Content() {
   return (
-    <View className=" ">
-      <Text className="text-3xl mx-auto  text-center border-b my-14 border-orange-400">
-        Our Brands
-      </Text>
-      <View className="h-[70vh] mx-4 rounded-3xl ">
-        <Text className="text-xl text-center mx-auto">Yougee</Text>
-        <Image
-          source={yougeeMain}
-          style={{ width: "100%", height: "95%", objectFit: "fill" }}
-        />
-        <View className="flex flex-col absolute bottom-2 w-full  justify-center items-center">
-          <Link href="/yougee" className="bg-black text-white px-4 py-3">
-            Shop Now
-          </Link>
-        </View>
+    <View style={styles.contentContainer}>
+      <View style={styles.header}>
+        <Text style={styles.headerText}>Our Brands</Text>
       </View>
-      <View className="h-[70vh] mx-4 rounded-3xl  mt-16">
-        <Text className="text-xl text-center mx-auto">Samba</Text>
-        <Image
-          source={sambaMain}
-          style={{ width: "100%", height: "100%", objectFit: "fill" }}
-        />
-        <View className="flex flex-col absolute bottom-2  justify-center items-center w-full ">
-          <Link href="/samba" className="bg-black  text-white px-4 py-3">
-            Shop Now
-          </Link>
-        </View>
-      </View>
+      <BrandCard title="Yougee" image={yougeeMain} link="/brand/yougee" />
+      <BrandCard title="Samba" image={sambaMain} link="/brand/samba" />
     </View>
   );
 }
+
+const index = () => {
+  return (
+    <View style={styles.container}>
+      <StatusBar style="auto" />
+      <Navbar />
+      <ScrollView style={styles.scrollView}>
+        <Content />
+      </ScrollView>
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#f0f0f0",
+  },
+  scrollView: {
+    marginBottom: 20,
+  },
+  contentContainer: {
+    flex: 1,
+  },
+  header: {
+    backgroundColor: "#ff9800",
+    paddingVertical: 20,
+    marginBottom: 20,
+  },
+  headerText: {
+    fontSize: 28,
+    fontWeight: "bold",
+    color: "white",
+    textAlign: "center",
+  },
+  cardContainer: {
+    height: width * 1.2,
+    marginHorizontal: 20,
+    borderRadius: 20,
+    overflow: "hidden",
+    backgroundColor: "white",
+    elevation: 5,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+  },
+  brandTitle: {
+    fontSize: 24,
+    fontWeight: "bold",
+    textAlign: "center",
+    marginVertical: 10,
+    color: "#333",
+  },
+  brandImage: {
+    width: "100%",
+    height: "100%",
+    resizeMode: "cover",
+  },
+  overlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "rgba(0,0,0,0.3)",
+    justifyContent: "flex-end",
+    alignItems: "center",
+    paddingBottom: 20,
+  },
+  shopButton: {
+    backgroundColor: "#000",
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    borderRadius: 25,
+  },
+  shopButtonText: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+});
+
 export default index;

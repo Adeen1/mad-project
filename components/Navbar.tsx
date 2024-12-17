@@ -1,51 +1,138 @@
-import { Link } from "expo-router";
 import React, { useState } from "react";
-import { View, Text } from "react-native";
-import Icon from "react-native-vector-icons/AntDesign";
-const Navbar = () => {
-  const [active, setActive] = useState(false);
-  return (
-    <View className="bg-gray-900 px-4 flex justify-between items-center hover:text-orange-600 flex-row py-4 mb-10">
-      <View className="flex flex-row">
-        <Icon name="home" color="#fb923c" size={20} />
-        <Link href="/" className="text-orange-400 ml-1">
-          Home
-        </Link>
-      </View>
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  Animated,
+} from "react-native";
+import { Link, usePathname } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
 
-      <View className="text-orange-400">
-        <View className="flex flex-row items-center">
-          {active ? (
-            <Icon color="#fb923c" size={13} name="caretup" />
-          ) : (
-            <Icon color="#fb923c" size={13} name="caretdown" />
-          )}
-          <Text
-            className="text-orange-500 ml-1"
-            onPress={() => setActive(!active)}
-          >
-            Products
-          </Text>
-        </View>
-        {active && (
-          <View className="absolute top-11 bg-black rounded-xl py-4 w-28 flex flex-col items-center justify-center z-50">
-            <Link href="/yougee" className="text-orange-400 underline mb-5">
-              Yougee
+const Navbar = () => {
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const pathname = usePathname();
+  const dropdownAnimation = new Animated.Value(0);
+
+  const toggleDropdown = () => {
+    setIsDropdownOpen(!isDropdownOpen);
+    Animated.timing(dropdownAnimation, {
+      toValue: isDropdownOpen ? 0 : 1,
+      duration: 300,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const dropdownStyle = {
+    ...styles.dropdown,
+    opacity: dropdownAnimation,
+    transform: [
+      {
+        translateY: dropdownAnimation.interpolate({
+          inputRange: [0, 1],
+          outputRange: [-20, 0],
+        }),
+      },
+    ],
+  };
+
+  return (
+    <View style={styles.navbar}>
+      <Link href="/" asChild>
+        <TouchableOpacity style={styles.navItem}>
+          <Ionicons name="home-outline" size={24} color="#ff9800" />
+          <Text style={styles.navText}>Home</Text>
+        </TouchableOpacity>
+      </Link>
+
+      <View>
+        <TouchableOpacity style={styles.navItem} onPress={toggleDropdown}>
+          <Ionicons
+            name={
+              isDropdownOpen ? "chevron-up-outline" : "chevron-down-outline"
+            }
+            size={24}
+            color="#ff9800"
+          />
+          <Text style={styles.navText}>Products</Text>
+        </TouchableOpacity>
+        {isDropdownOpen && (
+          <Animated.View style={dropdownStyle}>
+            <Link href="/brand/yougee" asChild>
+              <TouchableOpacity
+                style={[
+                  styles.dropdownItem,
+                  pathname.includes("/brand/yougee") && styles.activeLink,
+                ]}
+              >
+                <Text style={styles.dropdownText}>Yougee</Text>
+              </TouchableOpacity>
             </Link>
-            <Link href="/samba" className="text-orange-400 underline">
-              Samba
+            <Link href="/brand/samba" asChild>
+              <TouchableOpacity
+                style={[
+                  styles.dropdownItem,
+                  pathname.includes("/brand/samba") && styles.activeLink,
+                ]}
+              >
+                <Text style={styles.dropdownText}>Samba</Text>
+              </TouchableOpacity>
             </Link>
-          </View>
+          </Animated.View>
         )}
       </View>
-      <View className="flex flex-row">
-        <Icon name="shoppingcart" color="#fb923c" size={20} />
-        <Link href="/cart" className="text-orange-400 ml-1">
-          Cart
-        </Link>
-      </View>
+
+      <Link href="/cart" asChild>
+        <TouchableOpacity style={styles.navItem}>
+          <Ionicons name="cart-outline" size={24} color="#ff9800" />
+          <Text style={styles.navText}>Cart</Text>
+        </TouchableOpacity>
+      </Link>
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  navbar: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    backgroundColor: "#1a202c",
+    paddingVertical: 15,
+    paddingHorizontal: 20,
+    marginBottom: 10,
+  },
+  navItem: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  navText: {
+    color: "#ff9800",
+    marginLeft: 5,
+    fontSize: 16,
+  },
+  dropdown: {
+    position: "absolute",
+    top: 50,
+    right: 0,
+    backgroundColor: "#2d3748",
+    borderRadius: 10,
+    padding: 10,
+    minWidth: 120,
+    zIndex: 1000,
+  },
+  dropdownItem: {
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    borderRadius: 5,
+  },
+  dropdownText: {
+    color: "#ff9800",
+    fontSize: 16,
+  },
+  activeLink: {
+    backgroundColor: "#ff9800",
+  },
+});
 
 export default Navbar;
