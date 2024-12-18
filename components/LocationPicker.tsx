@@ -26,6 +26,7 @@ const LocationPicker: React.FC = () => {
         latitude: currentLocation.coords.latitude,
         longitude: currentLocation.coords.longitude,
       });
+        console.log(location);
     } catch (error) {
       Alert.alert("Error", "Unable to get current location");
     }

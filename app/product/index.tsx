@@ -5,7 +5,14 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import { Link, useLocalSearchParams, router } from "expo-router";
 import React, { useEffect, useState } from "react";
-import { Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import {
+  ActivityIndicator,
+  Image,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import Loader from "@/components/Loader";
 import { Cart, Product } from "../types/products";
 
@@ -81,7 +88,12 @@ const Index = () => {
   return (
     <ScrollView contentContainerStyle={{ paddingBottom: 20 }}>
       <Navbar />
-      {loading && <Loader />}
+      {loading && (
+        <View className="mt-10 w-[80%] mx-auto  flex flex-row justify-center items-center">
+          <Text>Loading ...</Text>
+          <ActivityIndicator size="large" color="#6200EE" />
+        </View>
+      )}
       {data.name && (
         <View className="flex pb-3 flex-grow flex-1  flex-col items-center w-[90%] mt-4">
           <Image

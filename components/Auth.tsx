@@ -8,8 +8,7 @@ import {
   AppState,
   ScrollView,
   Text,
-  SafeAreaView,
-  StatusBar,
+  ActivityIndicator,
 } from "react-native";
 import { supabase } from "@/utils/supabase";
 import Navbar from "./Navbar";
@@ -62,6 +61,8 @@ export default function Auth() {
         <Navbar />
         <View style={styles.container}>
           <Text style={styles.logo}>Cosmeto</Text>
+          {loading && <ActivityIndicator size="large" color="#6200EE" />}
+
           <Text style={styles.loginTitle}>Login</Text>
           <View style={styles.inputContainer}>
             <TextInput

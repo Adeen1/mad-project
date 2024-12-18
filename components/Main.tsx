@@ -86,7 +86,7 @@ function Content() {
 const Main = ({ email }: { email: string }) => {
   return (
     <View style={styles.container}>
-      <StatusBar style="auto" />
+      {/* <StatusBar style="auto" /> */}
       <Navbar />
       <ScrollView style={styles.scrollView}>
         <Content />

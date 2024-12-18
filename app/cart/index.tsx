@@ -8,6 +8,7 @@ import {
   StyleSheet,
   Image,
   Alert,
+  ActivityIndicator,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { supabase } from "@/utils/supabase";
@@ -144,11 +145,15 @@ const CartPage = () => {
     fetchData();
   }, []);
 
-  if (loading) return <Loader />;
-
   return (
     <ScrollView style={styles.container}>
       <Navbar />
+      {loading && (
+        <View className="mt-10 w-[80%] mx-auto  flex flex-row justify-center items-center">
+          <Text>Loading ...</Text>
+          <ActivityIndicator size="large" color="#6200EE" />
+        </View>
+      )}
       <View style={styles.content}>
         <Text style={styles.title}>Your Cart</Text>
 

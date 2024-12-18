@@ -6,6 +6,7 @@ import {
   StyleSheet,
   Dimensions,
   ImageBackground,
+  ActivityIndicator,
 } from "react-native";
 import { useLocalSearchParams } from "expo-router";
 import { supabase } from "@/utils/supabase";
@@ -60,7 +61,10 @@ const BrandPage = () => {
           </View>
         </ImageBackground>
         {loading ? (
-          <Loader />
+          <View className="mt-10 w-[80%] mx-auto  flex flex-row justify-center items-center">
+            <Text>Loading ...</Text>
+            <ActivityIndicator size="large" color="#6200EE" />
+          </View>
         ) : (
           <View style={styles.content}>
             <Text style={styles.subtitle}>Our Products</Text>
